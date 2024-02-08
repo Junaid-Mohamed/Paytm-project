@@ -27,6 +27,16 @@ const UserUpdateValidation = z.object({
     lastName:z.string()
 })
 
+
+userRouter.post("/loggedin",authMiddleWare,(req,res)=>{
+    console.log(req);
+    console.log(req.userId);
+    res.status(200).json({
+        message:"logged in"
+    })
+})
+
+
 // userRouter.use(bodyParser);
 userRouter.post("/signup",async (req,res)=>{
     const body = req.body;
@@ -36,11 +46,11 @@ userRouter.post("/signup",async (req,res)=>{
         username:body.username
     })
 
-    // console.log(user);
+    console.log(user);
 
     if(user && user._id){
         return res.json({
-            message:"User already exists."
+            message:"Username already exists."
         })
     }
 
@@ -109,7 +119,12 @@ userRouter.put("/update",authMiddleWare,async (req,res)=>{
 // to filter and get users 
 //  select * from Users u where u.firstName or u.lastName like "%like%" in sql
 userRouter.get("/bulk",async(req,res)=>{
-    const filter = req.body.filter || "";
+    // console.log(req.body)
+
+    // if you writing req.param.filer
+    //  then API will be /bulk/:filter
+    const filter = req.query.filter || "";
+    // console.log(filter);
     const users = await User.find({
         $or:[{
             firstName:{
@@ -122,7 +137,7 @@ userRouter.get("/bulk",async(req,res)=>{
             }
         }]
     })
-
+    // console.log(users);
     // indexing is better serach way to do this search.
     if(users.length == 0) return res.status(403).json({message:"User Not found"})
     // check stack over flow how to do two queries at the same time.
