@@ -12,19 +12,30 @@ export const Home = () =>{
 
     // in useEffect you can't write an async function, so .then syntax you have to follow.
     useEffect(()=>{
-         axios.post("http://localhost:3000/api/v1/user/loggedin",null,{
+         axios.post("http://localhost:3000/api/v1/user/authenticate",null,{
             headers:{
                 Authorization:`Bearer ${localStorage.getItem("token")}`
             }
         })
         .then(resp=> {
             console.log(resp);
-            resp.status === 200?console.log("yes"):console.log("no")
-        }).catch((e)=>console.log(e))
+            // if(resp.)
+           navigate('/dashboard');
+        }).catch((e)=>{
+            if(e.response.status === 403){
+                console.log("Access forbidden");
+                navigate('/signin')
+            }
+            else{
+                console.log("error",e);
+            }
+        })
     },[])
-
+    // If the request returns a 403 status code, the .then() block won't be executed. 
+    // Instead, the code will flow directly to the .catch() block, where you can 
+    // handle the 403 error or any other errors that may occur during the request.
     return(
-     <></>
+     <><div>Home page.</div></>
     )
 }
 

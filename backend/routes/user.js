@@ -28,14 +28,34 @@ const UserUpdateValidation = z.object({
 })
 
 
-userRouter.post("/loggedin",authMiddleWare,(req,res)=>{
-    console.log(req);
-    console.log(req.userId);
-    res.status(200).json({
-        message:"logged in"
+userRouter.post("/authenticate",authMiddleWare,async(req,res)=>{
+    
+    
+    const authenticatedUser = await User.findOne({_id:req.userId})
+    const authenticatedUserAccount = await Account.findOne({userId:req.userId}) 
+   
+    if(authenticatedUser && authenticatedUserAccount){
+        return res.status(200).json({
+            username:authenticatedUser.username,
+            balance:authenticatedUserAccount.balance
+        })
+    }
+    res.status(403).json({
+        message:"Access forbidden"
     })
+    
 })
 
+
+  // if(!authenticatedUser){
+        
+    //     return res.status(403).json({
+    //         message:"not logged in"
+    //     })
+    // }
+    // res.status(200).json({
+    //     username:authenticatedUser.username
+    // })
 
 // userRouter.use(bodyParser);
 userRouter.post("/signup",async (req,res)=>{
@@ -46,7 +66,7 @@ userRouter.post("/signup",async (req,res)=>{
         username:body.username
     })
 
-    console.log(user);
+   
 
     if(user && user._id){
         return res.json({
@@ -74,7 +94,7 @@ userRouter.post("/signup",async (req,res)=>{
     const token = jwt.sign({
         userId: newUser._id
     },JWT_SECRET)
-    res.json({
+    res.status(200).json({
         message:"User created successfully.",
         token:token
     })
